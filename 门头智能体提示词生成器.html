@@ -1,267 +1,400 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>商业门头设计AI · 海量风格版</title>
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            background: radial-gradient(circle at 20% 20%, #f8f0f8, #f0eef4);
-            min-height: 100vh; padding: 25px 20px; display: flex; flex-direction: column; align-items: center;
-        }
-        .header { text-align: center; margin-bottom: 20px; }
-        .header h1 {
-            font-size: 2rem; font-weight: 700;
-            background: linear-gradient(135deg, #b388eb, #e786a7);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text; letter-spacing: 1px; margin-bottom: 4px;
-        }
-        .header p { color: #7b6b82; font-size: 0.9rem; font-weight: 500; }
-        .main-layout { display: flex; gap: 18px; width: 100%; max-width: 1400px; align-items: flex-start; }
-        .left-panel {
-            flex: 1; max-width: 650px;
-            background: rgba(255,255,255,0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-radius: 28px; padding: 25px 22px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.06); border: 1px solid rgba(200,180,210,0.25);
-            position: sticky; top: 20px; max-height: 92vh; overflow-y: auto;
-        }
-        .left-panel::-webkit-scrollbar { width: 4px; }
-        .left-panel::-webkit-scrollbar-thumb { background: rgba(185,131,255,0.3); border-radius: 8px; }
-        .right-panel {
-            flex: 1.3; background: rgba(255,255,255,0.7); backdrop-filter: blur(20px);
-            border-radius: 28px; padding: 25px 22px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.06); border: 1px solid rgba(200,180,210,0.25);
-            display: flex; flex-direction: column; min-height: 600px; max-height: 92vh;
-        }
-        .right-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-shrink: 0; }
-        .right-header h3 { font-size: 1.1rem; font-weight: 700; color: #5e4b6b; }
-        .stats-badge { background: rgba(185,131,255,0.12); color: #7c3aed; font-size: 0.75rem; padding: 6px 14px; border-radius: 18px; font-weight: 600; }
-        .brand-row {
-            display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
-            background: rgba(255,255,255,0.6); border-radius: 16px; padding: 6px 6px 6px 18px;
-            backdrop-filter: blur(8px); border: 1px solid rgba(200,170,200,0.25);
-        }
-        .brand-row label { font-weight: 600; color: #5e4b6b; white-space: nowrap; font-size: 0.85rem; }
-        .brand-row input { flex:1; border:none; background:transparent; font-size:0.95rem; padding:11px 4px; outline:none; color:#2e1e33; }
-        .subtitle-row {
-            display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
-            background: rgba(255,255,255,0.55); border-radius: 16px; padding: 6px 6px 6px 18px;
-            backdrop-filter: blur(8px); border: 1px solid rgba(200,170,200,0.25);
-        }
-        .subtitle-row label { font-weight: 600; color: #5e4b6b; white-space: nowrap; font-size: 0.85rem; }
-        .subtitle-row input { flex:1; border:none; background:transparent; font-size:0.9rem; padding:11px 4px; outline:none; color:#2e1e33; }
-        .category-section { margin-bottom: 16px; }
-        .section-title {
-            font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#8b6f9a;
-            margin-bottom:8px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;
-        }
-        .section-title span { background:#efe4f5; padding:2px 7px; border-radius:14px; font-size:0.62rem; color:#7b5e8c; }
-        .industry-block { margin-bottom: 10px; }
-        .industry-label { display:inline-block; font-weight:700; font-size:0.72rem; color:#4a3a53; background:rgba(235,220,245,0.6); padding:3px 10px; border-radius:14px; margin-bottom:5px; }
-        .sub-btn-group { display:flex; flex-wrap:wrap; gap:5px; margin-left:2px; }
-        .style-btn-group { display:flex; flex-wrap:wrap; gap:5px; max-height: 300px; overflow-y: auto; padding: 4px; }
-        .style-btn-group::-webkit-scrollbar { width:4px; }
-        .style-btn-group::-webkit-scrollbar-thumb { background:rgba(185,131,255,0.3); border-radius:8px; }
-        .option-btn {
-            padding:5px 11px; border-radius:22px; border:1px solid #e2d4ea; background:rgba(255,255,255,0.75);
-            backdrop-filter:blur(6px); font-size:0.73rem; font-weight:500; color:#4a3a53; cursor:pointer;
-            transition:all 0.2s ease; white-space:nowrap; letter-spacing:0.2px;
-            display:inline-flex; align-items:center; gap:3px;
-        }
-        .option-btn:hover { background:rgba(255,240,250,0.9); border-color:#d0a0d8; }
-        .option-btn.selected { background:linear-gradient(135deg, #b983ff, #e786a7); color:white; border-color:transparent; font-weight:600; }
-        .color-swatch { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:2px; vertical-align:middle; box-shadow:0 0 0 1px rgba(0,0,0,0.1); }
-        .generate-btn {
-            width:100%; margin-top:14px; padding:14px; border-radius:44px;
-            background:linear-gradient(135deg, #b983ff, #e786a7); border:none; color:white;
-            font-size:1.05rem; font-weight:700; letter-spacing:1.5px; cursor:pointer; transition:0.3s;
-            box-shadow:0 10px 22px rgba(185,131,255,0.3);
-        }
-        .generate-btn:hover { filter:brightness(1.05); transform:translateY(-2px); }
-        .generate-btn:disabled { opacity:0.5; transform:none; pointer-events:none; }
-        .result-grid { flex:1; overflow-y:auto; padding-right:4px; display:flex; flex-direction:column; gap:10px; }
-        .result-grid::-webkit-scrollbar { width:4px; }
-        .result-grid::-webkit-scrollbar-thumb { background:rgba(185,131,255,0.3); border-radius:8px; }
-        .card {
-            background:rgba(255,255,255,0.85); backdrop-filter:blur(10px); border-radius:16px;
-            padding:14px; border:1px solid rgba(200,170,210,0.3); transition:0.2s;
-            display:flex; flex-direction:column; gap:8px;
-        }
-        .card-header { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
-        .card-number {
-            background:linear-gradient(135deg, #b983ff, #e786a7); color:white;
-            width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-            font-weight:700; font-size:0.72rem; flex-shrink:0;
-        }
-        .card-badge { background:rgba(185,131,255,0.12); color:#7c3aed; font-size:0.65rem; padding:2px 7px; border-radius:9px; font-weight:600; white-space:nowrap; }
-        .card-badge.green { background:rgba(134,200,167,0.15); color:#3d7a5c; }
-        .prompt-text { font-size:0.78rem; line-height:1.55; color:#2e1e33; white-space:pre-wrap; word-break:break-word; background:rgba(245,235,250,0.4); padding:10px; border-radius:10px; }
-        .copy-btn {
-            align-self:flex-end; background:linear-gradient(135deg, #b983ff, #e786a7); border:none;
-            color:white; padding:6px 12px; border-radius:20px; font-weight:600; font-size:0.72rem;
-            cursor:pointer; transition:0.2s; letter-spacing:0.3px;
-        }
-        .copy-btn:hover { transform:scale(1.04); }
-        .copy-btn.copied { background:#9b8aac; pointer-events:none; }
-        .empty-state { text-align:center; padding:50px 20px; color:#b0a0b5; font-size:0.9rem; }
-        select {
-            width:100%; padding:10px 14px; border-radius:26px; border:1px solid #e2d4ea;
-            background:rgba(255,255,255,0.7); font-size:0.82rem; color:#2e1e33; outline:none;
-            appearance:none;
-            background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b983ff' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat:no-repeat; background-position:right 12px center; background-size:14px;
-        }
-        .other-textarea { width:100%; padding:10px 14px; border-radius:16px; border:1px solid #e2d4ea; background:rgba(255,255,255,0.7); font-size:0.82rem; color:#2e1e33; outline:none; resize:vertical; min-height:70px; font-family:inherit; }
-        .other-textarea:focus { border-color:#b983ff; }
-        @media (max-width:900px) { .main-layout { flex-direction:column; } .left-panel { max-width:100%; position:static; max-height:none; } .right-panel { flex:1; min-height:400px; } }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>商业门头设计AI · 全功能修复版</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: radial-gradient(circle at 20% 20%, #f8f0f8, #f0eef4);
+      min-height: 100vh; padding: 25px 20px; display: flex; flex-direction: column; align-items: center;
+    }
+    .header { text-align: center; margin-bottom: 20px; }
+    .header h1 {
+      font-size: 2rem; font-weight: 700;
+      background: linear-gradient(135deg, #b388eb, #e786a7);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; letter-spacing: 1px; margin-bottom: 4px;
+    }
+    .header p { color: #7b6b82; font-size: 0.9rem; font-weight: 500; }
+    .main-layout { display: flex; gap: 18px; width: 100%; max-width: 1400px; align-items: flex-start; }
+    .left-panel {
+      flex: 1; max-width: 650px;
+      background: rgba(255,255,255,0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-radius: 28px; padding: 25px 22px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.06); border: 1px solid rgba(200,180,210,0.25);
+      position: sticky; top: 20px; max-height: 92vh; overflow-y: auto;
+    }
+    .left-panel::-webkit-scrollbar { width: 4px; }
+    .left-panel::-webkit-scrollbar-thumb { background: rgba(185,131,255,0.3); border-radius: 8px; }
+    .right-panel {
+      flex: 1.3; background: rgba(255,255,255,0.7); backdrop-filter: blur(20px);
+      border-radius: 28px; padding: 25px 22px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.06); border: 1px solid rgba(200,180,210,0.25);
+      display: flex; flex-direction: column; min-height: 600px; max-height: 92vh;
+    }
+    .right-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-shrink: 0; }
+    .right-header h3 { font-size: 1.1rem; font-weight: 700; color: #5e4b6b; }
+    .stats-badge { background: rgba(185,131,255,0.12); color: #7c3aed; font-size: 0.75rem; padding: 6px 14px; border-radius: 18px; font-weight: 600; }
+    .brand-row {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+      background: rgba(255,255,255,0.6); border-radius: 16px; padding: 6px 6px 6px 18px;
+      backdrop-filter: blur(8px); border: 1px solid rgba(200,170,200,0.25);
+    }
+    .brand-row label { font-weight: 600; color: #5e4b6b; white-space: nowrap; font-size: 0.85rem; }
+    .brand-row input { flex:1; border:none; background:transparent; font-size:0.95rem; padding:11px 4px; outline:none; color:#2e1e33; }
+    .subtitle-row {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+      background: rgba(255,255,255,0.55); border-radius: 16px; padding: 6px 6px 6px 18px;
+      backdrop-filter: blur(8px); border: 1px solid rgba(200,170,200,0.25);
+    }
+    .subtitle-row label { font-weight: 600; color: #5e4b6b; white-space: nowrap; font-size: 0.85rem; }
+    .subtitle-row input { flex:1; border:none; background:transparent; font-size:0.9rem; padding:11px 4px; outline:none; color:#2e1e33; }
+    .category-section { margin-bottom: 16px; }
+    .section-title {
+      font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#8b6f9a;
+      margin-bottom:8px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;
+    }
+    .section-title span { background:#efe4f5; padding:2px 7px; border-radius:14px; font-size:0.62rem; color:#7b5e8c; }
+    .industry-block { margin-bottom: 10px; }
+    .industry-label { display:inline-block; font-weight:700; font-size:0.72rem; color:#4a3a53; background:rgba(235,220,245,0.6); padding:3px 10px; border-radius:14px; margin-bottom:5px; }
+    .sub-btn-group { display:flex; flex-wrap:wrap; gap:5px; margin-left:2px; }
+    .style-btn-group { display:flex; flex-wrap:wrap; gap:5px; max-height: 300px; overflow-y: auto; padding: 4px; }
+    .style-btn-group::-webkit-scrollbar { width:4px; }
+    .style-btn-group::-webkit-scrollbar-thumb { background:rgba(185,131,255,0.3); border-radius:8px; }
+    .option-btn {
+      padding:5px 11px; border-radius:22px; border:1px solid #e2d4ea; background:rgba(255,255,255,0.75);
+      backdrop-filter:blur(6px); font-size:0.73rem; font-weight:500; color:#4a3a53; cursor:pointer;
+      transition:all 0.2s ease; white-space:nowrap; letter-spacing:0.2px;
+      display:inline-flex; align-items:center; gap:3px; user-select: none;
+    }
+    .option-btn:hover { background:rgba(255,240,250,0.9); border-color:#d0a0d8; }
+    .option-btn.selected { background:linear-gradient(135deg, #b983ff, #e786a7); color:white; border-color:transparent; font-weight:600; }
+    .color-swatch { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:2px; vertical-align:middle; box-shadow:0 0 0 1px rgba(0,0,0,0.1); }
+    .generate-btn {
+      width:100%; margin-top:14px; padding:14px; border-radius:44px;
+      background:linear-gradient(135deg, #b983ff, #e786a7); border:none; color:white;
+      font-size:1.05rem; font-weight:700; letter-spacing:1.5px; cursor:pointer; transition:0.3s;
+      box-shadow:0 10px 22px rgba(185,131,255,0.3);
+    }
+    .generate-btn:hover { filter:brightness(1.05); transform:translateY(-2px); }
+    .generate-btn:disabled { opacity:0.5; transform:none; pointer-events:none; }
+    .result-grid { flex:1; overflow-y:auto; padding-right:4px; display:flex; flex-direction:column; gap:10px; }
+    .result-grid::-webkit-scrollbar { width:4px; }
+    .result-grid::-webkit-scrollbar-thumb { background:rgba(185,131,255,0.3); border-radius:8px; }
+    .card {
+      background:rgba(255,255,255,0.85); backdrop-filter:blur(10px); border-radius:16px;
+      padding:14px; border:1px solid rgba(200,170,210,0.3); transition:0.2s;
+      display:flex; flex-direction:column; gap:8px;
+    }
+    .card-header { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+    .card-number {
+      background:linear-gradient(135deg, #b983ff, #e786a7); color:white;
+      width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+      font-weight:700; font-size:0.72rem; flex-shrink:0;
+    }
+    .card-badge { background:rgba(185,131,255,0.12); color:#7c3aed; font-size:0.65rem; padding:2px 7px; border-radius:9px; font-weight:600; white-space:nowrap; }
+    .card-badge.green { background:rgba(134,200,167,0.15); color:#3d7a5c; }
+    .prompt-text { font-size:0.78rem; line-height:1.55; color:#2e1e33; white-space:pre-wrap; word-break:break-word; background:rgba(245,235,250,0.4); padding:10px; border-radius:10px; }
+    .copy-btn {
+      align-self:flex-end; background:linear-gradient(135deg, #b983ff, #e786a7); border:none;
+      color:white; padding:6px 12px; border-radius:20px; font-weight:600; font-size:0.72rem;
+      cursor:pointer; transition:0.2s; letter-spacing:0.3px;
+    }
+    .copy-btn:hover { transform:scale(1.04); }
+    .copy-btn.copied { background:#9b8aac; pointer-events:none; }
+    .empty-state { text-align:center; padding:50px 20px; color:#b0a0b5; font-size:0.9rem; }
+    select {
+      width:100%; padding:10px 14px; border-radius:26px; border:1px solid #e2d4ea;
+      background:rgba(255,255,255,0.7); font-size:0.82rem; color:#2e1e33; outline:none;
+      appearance:none;
+      background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b983ff' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat:no-repeat; background-position:right 12px center; background-size:14px;
+    }
+    .other-textarea { width:100%; padding:10px 14px; border-radius:16px; border:1px solid #e2d4ea; background:rgba(255,255,255,0.7); font-size:0.82rem; color:#2e1e33; outline:none; resize:vertical; min-height:70px; font-family:inherit; }
+    .other-textarea:focus { border-color:#b983ff; }
+    @media (max-width:900px) { .main-layout { flex-direction:column; } .left-panel { max-width:100%; position:static; max-height:none; } .right-panel { flex:1; min-height:400px; } }
+  </style>
 </head>
 <body>
 <div class="header">
-    <h1>✨ 商业门头设计AI智能体</h1>
-    <p>海量风格 · 材质色块 · 异形分类 · 多选组合 · 稳定20组</p>
+  <h1>✨ 商业门头设计AI智能体</h1>
+  <p>海量风格 · 材质色块 · 异形分类 · 多选组合 · 稳定20组 · 全平台可用</p>
 </div>
 
 <div class="main-layout">
-    <div class="left-panel">
-        <div class="brand-row"><label>🏷️ 品牌</label><input id="brandInput" type="text" placeholder="品牌名称（必填）"></div>
-        <div class="subtitle-row"><label>📝 副标题</label><input id="subtitleInput" type="text" placeholder="自定义副标题（可留空）"></div>
+  <div class="left-panel">
+    <div class="brand-row"><label>🏷️ 品牌</label><input id="brandInput" type="text" placeholder="品牌名称（必填）"></div>
+    <div class="subtitle-row"><label>📝 副标题</label><input id="subtitleInput" type="text" placeholder="自定义副标题（可留空）"></div>
 
-        <div class="category-section"><div class="section-title">📌 行业分类 <span>可选多选</span></div>
-            <div id="industryContainer">
-                <div class="industry-block"><span class="industry-label">🍔 餐饮类</span><div class="sub-btn-group"><button class="option-btn" data-value="快餐小吃" data-parent="餐饮类">快餐小吃</button><button class="option-btn" data-value="火锅烤肉" data-parent="餐饮类">火锅烤肉</button><button class="option-btn" data-value="咖啡奶茶" data-parent="餐饮类">咖啡奶茶</button><button class="option-btn" data-value="甜品轻食" data-parent="餐饮类">甜品轻食</button><button class="option-btn" data-value="特色餐饮" data-parent="餐饮类">特色餐饮</button><button class="option-btn" data-value="面馆粉店" data-parent="餐饮类">面馆粉店</button></div></div>
-                <div class="industry-block"><span class="industry-label">🛍️ 零售类</span><div class="sub-btn-group"><button class="option-btn" data-value="服装店" data-parent="零售类">服装店</button><button class="option-btn" data-value="美妆店" data-parent="零售类">美妆店</button><button class="option-btn" data-value="饰品店" data-parent="零售类">饰品店</button><button class="option-btn" data-value="便利店" data-parent="零售类">便利店</button><button class="option-btn" data-value="手机数码店" data-parent="零售类">手机数码店</button><button class="option-btn" data-value="家居杂货" data-parent="零售类">家居杂货</button></div></div>
-                <div class="industry-block"><span class="industry-label">💇 生活服务类</span><div class="sub-btn-group"><button class="option-btn" data-value="美容美发" data-parent="生活服务类">美容美发</button><button class="option-btn" data-value="SPA养生" data-parent="生活服务类">SPA养生</button><button class="option-btn" data-value="教育培训" data-parent="生活服务类">教育培训</button><button class="option-btn" data-value="健身房" data-parent="生活服务类">健身房</button><button class="option-btn" data-value="洗衣店" data-parent="生活服务类">洗衣店</button><button class="option-btn" data-value="宠物店" data-parent="生活服务类">宠物店</button></div></div>
-                <div class="industry-block"><span class="industry-label">🏢 商业连锁</span><div class="sub-btn-group"><button class="option-btn" data-value="连锁餐饮" data-parent="商业连锁">连锁餐饮</button><button class="option-btn" data-value="药店" data-parent="商业连锁">药店</button><button class="option-btn" data-value="超市" data-parent="商业连锁">超市</button><button class="option-btn" data-value="品牌旗舰店" data-parent="商业连锁">品牌旗舰店</button><button class="option-btn" data-value="连锁便利店" data-parent="商业连锁">连锁便利店</button><button class="option-btn" data-value="品牌专卖店" data-parent="商业连锁">品牌专卖店</button></div></div>
-                <div class="industry-block"><span class="industry-label">🏨 地产酒店</span><div class="sub-btn-group"><button class="option-btn" data-value="售楼部" data-parent="地产酒店">售楼部</button><button class="option-btn" data-value="酒店" data-parent="地产酒店">酒店</button><button class="option-btn" data-value="民宿" data-parent="地产酒店">民宿</button><button class="option-btn" data-value="会所" data-parent="地产酒店">会所</button><button class="option-btn" data-value="高端商业空间" data-parent="地产酒店">高端商业空间</button><button class="option-btn" data-value="展厅" data-parent="地产酒店">展厅</button></div></div>
-                <div class="industry-block"><span class="industry-label">🌙 夜经济</span><div class="sub-btn-group"><button class="option-btn" data-value="酒吧" data-parent="夜经济">酒吧</button><button class="option-btn" data-value="KTV" data-parent="夜经济">KTV</button><button class="option-btn" data-value="夜市" data-parent="夜经济">夜市</button><button class="option-btn" data-value="电竞馆" data-parent="夜经济">电竞馆</button><button class="option-btn" data-value="LiveHouse" data-parent="夜经济">LiveHouse</button><button class="option-btn" data-value="剧本杀" data-parent="夜经济">剧本杀</button></div></div>
-                <div class="industry-block"><span class="industry-label">🚗 汽车</span><div class="sub-btn-group"><button class="option-btn" data-value="洗车店" data-parent="汽车">洗车店</button><button class="option-btn" data-value="贴膜店" data-parent="汽车">贴膜店</button><button class="option-btn" data-value="改装店" data-parent="汽车">改装店</button><button class="option-btn" data-value="4S店" data-parent="汽车">4S店</button><button class="option-btn" data-value="汽车美容" data-parent="汽车">汽车美容</button><button class="option-btn" data-value="汽修店" data-parent="汽车">汽修店</button></div></div>
-                <div class="industry-block"><span class="industry-label">🏥 医疗健康</span><div class="sub-btn-group"><button class="option-btn" data-value="口腔诊所" data-parent="医疗健康">口腔诊所</button><button class="option-btn" data-value="中医诊所" data-parent="医疗健康">中医诊所</button><button class="option-btn" data-value="医美机构" data-parent="医疗健康">医美机构</button><button class="option-btn" data-value="药店" data-parent="医疗健康">药店</button><button class="option-btn" data-value="体检中心" data-parent="医疗健康">体检中心</button><button class="option-btn" data-value="眼科诊所" data-parent="医疗健康">眼科诊所</button></div></div>
-            </div>
-        </div>
-
-        <div class="category-section"><div class="section-title">🎨 门头风格/样式 <span>可选多选</span></div>
-            <div class="style-btn-group" id="styleGroup"></div>
-        </div>
-
-        <!-- 异形、材质、字体、颜色等区域保持不变，此处省略重复代码以节省空间 -->
-        <!-- 实际部署时需包含完整异形/材质/字体/颜色等按钮 -->
-        <div class="category-section"><div class="section-title">🎭 异形门头分类 <span>可选多选</span></div><div id="shapeContainer"><!-- 省略详细异形按钮，保持与前文一致 --></div></div>
-        <div class="category-section"><div class="section-title">🧱 门头材质系统 <span>可选多选</span></div><div id="materialContainer"><!-- 省略详细材质按钮 --></div></div>
-        <div class="category-section"><div class="section-title">🔤 招牌文字字体材质 <span>可选多选</span></div><div id="fontMaterialContainer"><!-- 省略详细字体按钮 --></div></div>
-        <div class="category-section"><div class="section-title">🎨 颜色选择 <span>可选多选</span></div><div id="colorContainer" class="style-btn-group"></div></div>
-
-        <div class="category-section"><div class="section-title">📐 门头布局 <span>可选</span></div>
-            <div class="style-btn-group" id="layoutGroup"><button class="option-btn" data-value="单开间门头">🚪单开间</button><button class="option-btn" data-value="双开间门头">🚪🚪双开间</button><button class="option-btn" data-value="三开间门头">🚪🚪🚪三开间</button><button class="option-btn" data-value="横向超宽">📏横向超宽</button><button class="option-btn" data-value="竖向">📐竖向</button><button class="option-btn" data-value="多层">📚多层</button><button class="option-btn" data-value="叠加">🪜叠加</button></div>
-        </div>
-        <div class="category-section"><div class="section-title">🏢 门头层数 <span>可选</span></div>
-            <div class="style-btn-group" id="layerGroup"><button class="option-btn" data-value="一层">1️⃣一层</button><button class="option-btn" data-value="二层">2️⃣二层</button><button class="option-btn" data-value="三层">3️⃣三层</button><button class="option-btn" data-value="四层">4️⃣四层</button><button class="option-btn" data-value="五层">5️⃣五层</button><button class="option-btn" data-value="六层">6️⃣六层</button></div>
-        </div>
-        <div class="category-section"><div class="section-title">🌗 时间场景 <span>可选</span></div>
-            <div class="style-btn-group" id="timeGroup"><button class="option-btn" data-value="白天">☀️白天</button><button class="option-btn" data-value="黑夜">🌙黑夜</button></div>
-        </div>
-        <div class="category-section"><div class="section-title">📍 商圈环境</div>
-            <select id="districtSelect"><option value="不限">🌐不限（随机匹配）</option><option value="高端购物中心">高端购物中心</option><option value="临街独立商铺">临街独立商铺</option><option value="步行街">步行街</option><option value="社区底商">社区底商</option><option value="百货商场一层">百货商场一层</option><option value="艺术园区">艺术园区</option><option value="交通枢纽">交通枢纽</option><option value="地下商业街">地下商业街</option></select>
-        </div>
-        <div class="category-section"><div class="section-title">💬 其他需求描述</div><textarea id="otherInput" class="other-textarea" placeholder="自定义其他需求（可留空）"></textarea></div>
-        <button class="generate-btn" id="generateBtn">⚡ 生成20组结构化提示词</button>
+    <!-- 行业分类 -->
+    <div class="category-section"><div class="section-title">📌 行业分类 <span>可选多选</span></div>
+      <div id="industryContainer">
+        <div class="industry-block"><span class="industry-label">🍔 餐饮类</span><div class="sub-btn-group"><button class="option-btn" data-value="快餐小吃" data-parent="餐饮类">快餐小吃</button><button class="option-btn" data-value="火锅烤肉" data-parent="餐饮类">火锅烤肉</button><button class="option-btn" data-value="咖啡奶茶" data-parent="餐饮类">咖啡奶茶</button><button class="option-btn" data-value="甜品轻食" data-parent="餐饮类">甜品轻食</button><button class="option-btn" data-value="特色餐饮" data-parent="餐饮类">特色餐饮</button><button class="option-btn" data-value="面馆粉店" data-parent="餐饮类">面馆粉店</button></div></div>
+        <div class="industry-block"><span class="industry-label">🛍️ 零售类</span><div class="sub-btn-group"><button class="option-btn" data-value="服装店" data-parent="零售类">服装店</button><button class="option-btn" data-value="美妆店" data-parent="零售类">美妆店</button><button class="option-btn" data-value="饰品店" data-parent="零售类">饰品店</button><button class="option-btn" data-value="便利店" data-parent="零售类">便利店</button><button class="option-btn" data-value="手机数码店" data-parent="零售类">手机数码店</button><button class="option-btn" data-value="家居杂货" data-parent="零售类">家居杂货</button></div></div>
+        <div class="industry-block"><span class="industry-label">💇 生活服务类</span><div class="sub-btn-group"><button class="option-btn" data-value="美容美发" data-parent="生活服务类">美容美发</button><button class="option-btn" data-value="SPA养生" data-parent="生活服务类">SPA养生</button><button class="option-btn" data-value="教育培训" data-parent="生活服务类">教育培训</button><button class="option-btn" data-value="健身房" data-parent="生活服务类">健身房</button><button class="option-btn" data-value="洗衣店" data-parent="生活服务类">洗衣店</button><button class="option-btn" data-value="宠物店" data-parent="生活服务类">宠物店</button></div></div>
+        <div class="industry-block"><span class="industry-label">🏢 商业连锁</span><div class="sub-btn-group"><button class="option-btn" data-value="连锁餐饮" data-parent="商业连锁">连锁餐饮</button><button class="option-btn" data-value="药店" data-parent="商业连锁">药店</button><button class="option-btn" data-value="超市" data-parent="商业连锁">超市</button><button class="option-btn" data-value="品牌旗舰店" data-parent="商业连锁">品牌旗舰店</button><button class="option-btn" data-value="连锁便利店" data-parent="商业连锁">连锁便利店</button><button class="option-btn" data-value="品牌专卖店" data-parent="商业连锁">品牌专卖店</button></div></div>
+        <div class="industry-block"><span class="industry-label">🏨 地产酒店</span><div class="sub-btn-group"><button class="option-btn" data-value="售楼部" data-parent="地产酒店">售楼部</button><button class="option-btn" data-value="酒店" data-parent="地产酒店">酒店</button><button class="option-btn" data-value="民宿" data-parent="地产酒店">民宿</button><button class="option-btn" data-value="会所" data-parent="地产酒店">会所</button><button class="option-btn" data-value="高端商业空间" data-parent="地产酒店">高端商业空间</button><button class="option-btn" data-value="展厅" data-parent="地产酒店">展厅</button></div></div>
+        <div class="industry-block"><span class="industry-label">🌙 夜经济</span><div class="sub-btn-group"><button class="option-btn" data-value="酒吧" data-parent="夜经济">酒吧</button><button class="option-btn" data-value="KTV" data-parent="夜经济">KTV</button><button class="option-btn" data-value="夜市" data-parent="夜经济">夜市</button><button class="option-btn" data-value="电竞馆" data-parent="夜经济">电竞馆</button><button class="option-btn" data-value="LiveHouse" data-parent="夜经济">LiveHouse</button><button class="option-btn" data-value="剧本杀" data-parent="夜经济">剧本杀</button></div></div>
+        <div class="industry-block"><span class="industry-label">🚗 汽车</span><div class="sub-btn-group"><button class="option-btn" data-value="洗车店" data-parent="汽车">洗车店</button><button class="option-btn" data-value="贴膜店" data-parent="汽车">贴膜店</button><button class="option-btn" data-value="改装店" data-parent="汽车">改装店</button><button class="option-btn" data-value="4S店" data-parent="汽车">4S店</button><button class="option-btn" data-value="汽车美容" data-parent="汽车">汽车美容</button><button class="option-btn" data-value="汽修店" data-parent="汽车">汽修店</button></div></div>
+        <div class="industry-block"><span class="industry-label">🏥 医疗健康</span><div class="sub-btn-group"><button class="option-btn" data-value="口腔诊所" data-parent="医疗健康">口腔诊所</button><button class="option-btn" data-value="中医诊所" data-parent="医疗健康">中医诊所</button><button class="option-btn" data-value="医美机构" data-parent="医疗健康">医美机构</button><button class="option-btn" data-value="药店" data-parent="医疗健康">药店</button><button class="option-btn" data-value="体检中心" data-parent="医疗健康">体检中心</button><button class="option-btn" data-value="眼科诊所" data-parent="医疗健康">眼科诊所</button></div></div>
+      </div>
     </div>
 
-    <div class="right-panel">
-        <div class="right-header"><h3>📋 生成结果</h3><span class="stats-badge" id="statsBadge">点击生成</span></div>
-        <div class="result-grid" id="resultsGrid"><div class="empty-state">👈 按需多选，点击生成</div></div>
+    <!-- 门头风格/样式 (动态渲染) -->
+    <div class="category-section"><div class="section-title">🎨 门头风格/样式 <span>可选多选</span></div>
+      <div class="style-btn-group" id="styleGroup"></div>
     </div>
+
+    <!-- 异形门头分类 -->
+    <div class="category-section"><div class="section-title">🎭 异形门头分类 <span>可选多选</span></div>
+      <div id="shapeContainer">
+        <div class="industry-block"><span class="industry-label">📐常见</span><div class="sub-btn-group"><button class="option-btn" data-value="圆形门头" data-parent="常见">圆形</button><button class="option-btn" data-value="半圆拱形门头" data-parent="常见">半圆拱</button><button class="option-btn" data-value="波浪曲线门头" data-parent="常见">波浪</button><button class="option-btn" data-value="不规则切角门头" data-parent="常见">切角</button><button class="option-btn" data-value="三角结构门头" data-parent="常见">三角</button><button class="option-btn" data-value="梯形门头" data-parent="常见">梯形</button><button class="option-btn" data-value="弧面包裹门头" data-parent="常见">弧面</button><button class="option-btn" data-value="悬浮门头" data-parent="常见">悬浮</button><button class="option-btn" data-value="几何拼接门头" data-parent="常见">几何拼接</button><button class="option-btn" data-value="破碎结构门头" data-parent="常见">破碎</button><button class="option-btn" data-value="镂空切割门头" data-parent="常见">镂空</button><button class="option-btn" data-value="折纸结构门头" data-parent="常见">折纸</button><button class="option-btn" data-value="立体穿插门头" data-parent="常见">穿插</button><button class="option-btn" data-value="流线型门头" data-parent="常见">流线</button><button class="option-btn" data-value="UFO飞船型门头" data-parent="常见">UFO</button><button class="option-btn" data-value="洞穴感门头" data-parent="常见">洞穴</button><button class="option-btn" data-value="山体感门头" data-parent="常见">山体</button><button class="option-btn" data-value="云朵轮廓门头" data-parent="常见">云朵</button><button class="option-btn" data-value="水滴造型门头" data-parent="常见">水滴</button><button class="option-btn" data-value="胶囊造型门头" data-parent="常见">胶囊</button><button class="option-btn" data-value="巨型盒子结构门头" data-parent="常见">盒子</button></div></div>
+        <div class="industry-block"><span class="industry-label">🏗️立体</span><div class="sub-btn-group"><button class="option-btn" data-value="外凸结构" data-parent="立体">外凸</button><button class="option-btn" data-value="内凹结构" data-parent="立体">内凹</button><button class="option-btn" data-value="包裹式结构" data-parent="立体">包裹</button><button class="option-btn" data-value="悬挑式结构" data-parent="立体">悬挑</button><button class="option-btn" data-value="多层穿插结构" data-parent="立体">穿插</button><button class="option-btn" data-value="巨型体块结构" data-parent="立体">体块</button><button class="option-btn" data-value="漂浮结构" data-parent="立体">漂浮</button><button class="option-btn" data-value="建筑延伸结构" data-parent="立体">延伸</button><button class="option-btn" data-value="盒体堆叠结构" data-parent="立体">堆叠</button><button class="option-btn" data-value="参数化结构" data-parent="立体">参数化</button><button class="option-btn" data-value="龙骨外露结构" data-parent="立体">龙骨</button><button class="option-btn" data-value="机械装甲结构" data-parent="立体">装甲</button><button class="option-btn" data-value="未来科技结构" data-parent="立体">未来科技</button><button class="option-btn" data-value="骨骼结构" data-parent="立体">骨骼</button><button class="option-btn" data-value="隧道式入口" data-parent="立体">隧道</button><button class="option-btn" data-value="深渊感入口" data-parent="立体">深渊</button><button class="option-btn" data-value="舞台感门头" data-parent="立体">舞台</button><button class="option-btn" data-value="剧场式门头" data-parent="立体">剧场</button><button class="option-btn" data-value="太空舱结构" data-parent="立体">太空舱</button><button class="option-btn" data-value="集装箱改造结构" data-parent="立体">集装箱</button><button class="option-btn" data-value="洞口型结构" data-parent="立体">洞口</button><button class="option-btn" data-value="巨型框景结构" data-parent="立体">框景</button></div></div>
+      </div>
+    </div>
+
+    <!-- 材质系统 -->
+    <div class="category-section"><div class="section-title">🧱 门头材质系统 <span>可选多选</span></div>
+      <div id="materialContainer">
+        <div class="industry-block"><span class="industry-label">🔩金属</span><div class="sub-btn-group"><button class="option-btn" data-value="不锈钢" data-parent="金属">🪙不锈钢</button><button class="option-btn" data-value="黑钛金" data-parent="金属">⚫黑钛金</button><button class="option-btn" data-value="铝塑板" data-parent="金属">🔸铝塑板</button><button class="option-btn" data-value="铝单板" data-parent="金属">🟫铝单板</button><button class="option-btn" data-value="镀锌板" data-parent="金属">🔩镀锌板</button><button class="option-btn" data-value="铜板" data-parent="金属">🟤铜板</button></div></div>
+        <div class="industry-block"><span class="industry-label">🪵木质</span><div class="sub-btn-group"><button class="option-btn" data-value="防腐木" data-parent="木质">🪵防腐木</button><button class="option-btn" data-value="木饰面" data-parent="木质">🪹木饰面</button><button class="option-btn" data-value="原木板" data-parent="木质">🌳原木板</button><button class="option-btn" data-value="碳化木" data-parent="木质">🪵碳化木</button><button class="option-btn" data-value="竹木" data-parent="木质">🎋竹木</button></div></div>
+        <div class="industry-block"><span class="industry-label">🪨石材</span><div class="sub-btn-group"><button class="option-btn" data-value="岩板" data-parent="石材">🪨岩板</button><button class="option-btn" data-value="大理石" data-parent="石材">🗿大理石</button><button class="option-btn" data-value="微水泥" data-parent="石材">🧱微水泥</button><button class="option-btn" data-value="花岗岩" data-parent="石材">⛰️花岗岩</button><button class="option-btn" data-value="水磨石" data-parent="石材">🪨水磨石</button></div></div>
+        <div class="industry-block"><span class="industry-label">🪟玻璃</span><div class="sub-btn-group"><button class="option-btn" data-value="长虹玻璃" data-parent="玻璃">🪟长虹玻璃</button><button class="option-btn" data-value="艺术玻璃" data-parent="玻璃">🎨艺术玻璃</button><button class="option-btn" data-value="钢化玻璃" data-parent="玻璃">💎钢化玻璃</button><button class="option-btn" data-value="夹胶玻璃" data-parent="玻璃">🪟夹胶玻璃</button><button class="option-btn" data-value="磨砂玻璃" data-parent="玻璃">🌫️磨砂玻璃</button></div></div>
+        <div class="industry-block"><span class="industry-label">📺数字</span><div class="sub-btn-group"><button class="option-btn" data-value="LED屏" data-parent="数字">📺LED屏</button><button class="option-btn" data-value="全息屏" data-parent="数字">🌐全息屏</button><button class="option-btn" data-value="动态广告屏" data-parent="数字">🖥️动态屏</button><button class="option-btn" data-value="透明屏" data-parent="数字">🪞透明屏</button><button class="option-btn" data-value="互动屏幕" data-parent="数字">📱互动屏</button></div></div>
+        <div class="industry-block"><span class="industry-label">🎭特殊</span><div class="sub-btn-group"><button class="option-btn" data-value="格栅" data-parent="特殊">📏格栅</button><button class="option-btn" data-value="冲孔板" data-parent="特殊">🕳️冲孔板</button><button class="option-btn" data-value="霓虹灯" data-parent="特殊">💈霓虹灯</button><button class="option-btn" data-value="艺术装置" data-parent="特殊">🗿艺术装置</button><button class="option-btn" data-value="透光膜" data-parent="特殊">🎞️透光膜</button><button class="option-btn" data-value="3D打印造型" data-parent="特殊">🖨️3D打印</button></div></div>
+      </div>
+    </div>
+
+    <!-- 字体材质 -->
+    <div class="category-section"><div class="section-title">🔤 招牌文字字体材质 <span>可选多选</span></div>
+      <div id="fontMaterialContainer">
+        <div class="industry-block"><span class="industry-label">金属</span><div class="sub-btn-group"><button class="option-btn" data-value="不锈钢字" data-parent="金属类">🪙不锈钢</button><button class="option-btn" data-value="钛金字" data-parent="金属类">🥇钛金</button><button class="option-btn" data-value="镀锌铁皮字" data-parent="金属类">🔩镀锌</button><button class="option-btn" data-value="铝板字" data-parent="金属类">🔸铝板</button><button class="option-btn" data-value="铝型材字" data-parent="金属类">🟫铝型材</button><button class="option-btn" data-value="黄铜字" data-parent="金属类">🟤黄铜</button><button class="option-btn" data-value="紫铜字" data-parent="金属类">🟠紫铜</button></div></div>
+        <div class="industry-block"><span class="industry-label">亚克力</span><div class="sub-btn-group"><button class="option-btn" data-value="亚克力实心字" data-parent="亚克力">🔮实心</button><button class="option-btn" data-value="亚克力发光字" data-parent="亚克力">💡发光</button><button class="option-btn" data-value="亚克力背光字" data-parent="亚克力">✨背光</button><button class="option-btn" data-value="亚克力烤漆字" data-parent="亚克力">🎨烤漆</button></div></div>
+        <div class="industry-block"><span class="industry-label">发光专用</span><div class="sub-btn-group"><button class="option-btn" data-value="树脂发光字" data-parent="发光">💧树脂</button><button class="option-btn" data-value="迷你发光字" data-parent="发光">🔮迷你</button><button class="option-btn" data-value="无边框发光字" data-parent="发光">🔲无边框</button><button class="option-btn" data-value="冲孔外露灯字" data-parent="发光">🕯️冲孔</button></div></div>
+        <div class="industry-block"><span class="industry-label">PVC</span><div class="sub-btn-group"><button class="option-btn" data-value="PVC雪弗板实心字" data-parent="PVC">📦实心</button><button class="option-btn" data-value="PVC烤漆字" data-parent="PVC">🎨烤漆</button></div></div>
+        <div class="industry-block"><span class="industry-label">木质</span><div class="sub-btn-group"><button class="option-btn" data-value="实木字" data-parent="木质类">🪵实木</button><button class="option-btn" data-value="防腐木字" data-parent="木质类">🌲防腐木</button><button class="option-btn" data-value="密度板雕刻字" data-parent="木质类">🪚密度板</button></div></div>
+        <div class="industry-block"><span class="industry-label">特殊</span><div class="sub-btn-group"><button class="option-btn" data-value="水晶字" data-parent="特殊类">💎水晶</button><button class="option-btn" data-value="玻璃钢字" data-parent="特殊类">🪞玻璃钢</button><button class="option-btn" data-value="霓虹灯字" data-parent="特殊类">💈霓虹灯</button><button class="option-btn" data-value="泡沫字" data-parent="特殊类">🧽泡沫</button></div></div>
+      </div>
+    </div>
+
+    <!-- 颜色选择 -->
+    <div class="category-section"><div class="section-title">🎨 颜色选择 <span>可选多选</span></div><div id="colorContainer" class="style-btn-group"></div></div>
+
+    <div class="category-section"><div class="section-title">📐 门头布局 <span>可选</span></div>
+      <div class="style-btn-group" id="layoutGroup"><button class="option-btn" data-value="单开间门头">🚪单开间</button><button class="option-btn" data-value="双开间门头">🚪🚪双开间</button><button class="option-btn" data-value="三开间门头">🚪🚪🚪三开间</button><button class="option-btn" data-value="横向超宽">📏横向超宽</button><button class="option-btn" data-value="竖向">📐竖向</button><button class="option-btn" data-value="多层">📚多层</button><button class="option-btn" data-value="叠加">🪜叠加</button></div>
+    </div>
+    <div class="category-section"><div class="section-title">🏢 门头层数 <span>可选</span></div>
+      <div class="style-btn-group" id="layerGroup"><button class="option-btn" data-value="一层">1️⃣一层</button><button class="option-btn" data-value="二层">2️⃣二层</button><button class="option-btn" data-value="三层">3️⃣三层</button><button class="option-btn" data-value="四层">4️⃣四层</button><button class="option-btn" data-value="五层">5️⃣五层</button><button class="option-btn" data-value="六层">6️⃣六层</button></div>
+    </div>
+    <div class="category-section"><div class="section-title">🌗 时间场景 <span>可选</span></div>
+      <div class="style-btn-group" id="timeGroup"><button class="option-btn" data-value="白天">☀️白天</button><button class="option-btn" data-value="黑夜">🌙黑夜</button></div>
+    </div>
+    <div class="category-section"><div class="section-title">📍 商圈环境</div>
+      <select id="districtSelect"><option value="不限">🌐不限（随机匹配）</option><option value="高端购物中心">高端购物中心</option><option value="临街独立商铺">临街独立商铺</option><option value="步行街">步行街</option><option value="社区底商">社区底商</option><option value="百货商场一层">百货商场一层</option><option value="艺术园区">艺术园区</option><option value="交通枢纽">交通枢纽</option><option value="地下商业街">地下商业街</option></select>
+    </div>
+    <div class="category-section"><div class="section-title">💬 其他需求描述</div><textarea id="otherInput" class="other-textarea" placeholder="自定义其他需求（可留空）"></textarea></div>
+    <button class="generate-btn" id="generateBtn">⚡ 生成20组结构化提示词</button>
+  </div>
+
+  <div class="right-panel">
+    <div class="right-header"><h3>📋 生成结果</h3><span class="stats-badge" id="statsBadge">点击生成</span></div>
+    <div class="result-grid" id="resultsGrid"><div class="empty-state">👈 按需多选，点击生成</div></div>
+  </div>
 </div>
 
 <script>
-    (function() {
-        // 色彩数据 (保持与前文一致)
-        const colorPalette = [ /* ... 省略以节省篇幅，实际部署需完整包含 */ ];
-        function renderColorButtons(){ /* ... */ }
+  (function() {
+    // 颜色数据
+    const colorPalette = [
+      { cat:'纯色系·白', swatches:['#ffffff'], name:'纯白' },{ cat:'纯色系·白', swatches:['#fdf5e6'], name:'暖白' },{ cat:'纯色系·白', swatches:['#faf0e6'], name:'米白' },{ cat:'纯色系·白', swatches:['#fff5ee'], name:'奶白' },{ cat:'纯色系·白', swatches:['#fffff0'], name:'象牙白' },{ cat:'纯色系·白', swatches:['#fff0f5'], name:'珍珠白' },{ cat:'纯色系·白', swatches:['#f8f8ff'], name:'冷白' },{ cat:'纯色系·白', swatches:['#f5f5f5'], name:'月光白' },{ cat:'纯色系·白', swatches:['#f0f0f0'], name:'雾白' },{ cat:'纯色系·白', swatches:['#e8e8e8'], name:'高级灰白' },
+      { cat:'纯色系·黑', swatches:['#000000'], name:'纯黑' },{ cat:'纯色系·黑', swatches:['#1a1a1a'], name:'哑黑' },{ cat:'纯色系·黑', swatches:['#2d2d2d'], name:'炭黑' },{ cat:'纯色系·黑', swatches:['#0a0a0a'], name:'曜石黑' },{ cat:'纯色系·黑', swatches:['#1c1c1c'], name:'钢琴黑' },{ cat:'纯色系·黑', swatches:['#2b2b2b'], name:'磨砂黑' },{ cat:'纯色系·黑', swatches:['#121212'], name:'星空黑' },{ cat:'纯色系·黑', swatches:['#1e1e1e'], name:'石墨黑' },{ cat:'纯色系·黑', swatches:['#0d0d0d'], name:'黑金黑' },{ cat:'纯色系·黑', swatches:['#111111'], name:'深空黑' },
+      { cat:'纯色系·灰', swatches:['#d3d3d3'], name:'浅灰' },{ cat:'纯色系·灰', swatches:['#a9a9a9'], name:'中灰' },{ cat:'纯色系·灰', swatches:['#696969'], name:'深灰' },{ cat:'纯色系·灰', swatches:['#808080'], name:'水泥灰' },{ cat:'纯色系·灰', swatches:['#5f5f5f'], name:'工业灰' },{ cat:'纯色系·灰', swatches:['#c0c0c0'], name:'银灰' },{ cat:'纯色系·灰', swatches:['#4a4a4a'], name:'枪灰' },{ cat:'纯色系·灰', swatches:['#b0b0b0'], name:'雾霾灰' },{ cat:'纯色系·灰', swatches:['#8c8c8c'], name:'科技灰' },{ cat:'纯色系·灰', swatches:['#6c6c6c'], name:'高级灰' },
+      { cat:'纯色系·红', swatches:['#e60012'], name:'中国红' },{ cat:'纯色系·红', swatches:['#ff0000'], name:'正红' },{ cat:'纯色系·红', swatches:['#800020'], name:'酒红' },{ cat:'纯色系·红', swatches:['#b22222'], name:'砖红' },{ cat:'纯色系·红', swatches:['#c85a17'], name:'枫叶红' },{ cat:'纯色系·红', swatches:['#9b1b30'], name:'朱砂红' },{ cat:'纯色系·红', swatches:['#8b0000'], name:'暗红' },{ cat:'纯色系·红', swatches:['#ff4500'], name:'番茄红' },{ cat:'纯色系·红', swatches:['#de3163'], name:'樱桃红' },{ cat:'纯色系·红', swatches:['#ff2800'], name:'法拉利红' },{ cat:'纯色系·红', swatches:['#ff007f'], name:'玫瑰红' },{ cat:'纯色系·红', swatches:['#4a0010'], name:'深酒红' },{ cat:'纯色系·红', swatches:['#8b0025'], name:'绛红' },{ cat:'纯色系·红', swatches:['#c40000'], name:'国潮红' },
+      { cat:'黑金系', swatches:['#000000','#ffd700'], name:'黑+金' },{ cat:'黑金系', swatches:['#2d2d2d','#cfb53b'], name:'哑黑+拉丝金' },{ cat:'黑金系', swatches:['#1a1a1a','#c8a96e'], name:'深黑+香槟金' },{ cat:'黑金系', swatches:['#2d2d2d','#b87333'], name:'炭黑+古铜金' },{ cat:'黑金系', swatches:['#000000','#ffd700'], name:'黑+镜面金' },{ cat:'黑金系', swatches:['#0a0a0a','#daa520'], name:'曜石黑+土豪金' },{ cat:'黑金系', swatches:['#111111','#b8860b'], name:'深空黑+暗金' },
+      { cat:'白金系', swatches:['#ffffff','#ffd700'], name:'白+金' },{ cat:'白金系', swatches:['#fdf5e6','#c8a96e'], name:'奶白+香槟金' },{ cat:'白金系', swatches:['#faf0e6','#b76e79'], name:'米白+玫瑰金' },{ cat:'白金系', swatches:['#fffff0','#d4af37'], name:'象牙白+浅金' },{ cat:'白金系', swatches:['#fff0f5','#ffd700'], name:'珍珠白+镜面金' },
+      { cat:'奶油系', swatches:['#fdf5e6','#c4a882'], name:'奶白+奶咖' },{ cat:'奶油系', swatches:['#fff8dc','#d2b48c'], name:'奶黄+奶棕' },{ cat:'奶油系', swatches:['#faf0e6','#8b5a2b'], name:'米白+原木色' },{ cat:'奶油系', swatches:['#fdf5e6','#c8a96e'], name:'奶油白+浅金' },
+      { cat:'多巴胺', swatches:['#ff0000','#ffff00','#0000ff'], name:'高饱和红黄蓝' },{ cat:'多巴胺', swatches:['#0000ff','#ff8c00'], name:'蓝橙撞色' },{ cat:'多巴胺', swatches:['#ffff00','#800080'], name:'黄紫撞色' },{ cat:'多巴胺', swatches:['#ff69b4','#00ff00'], name:'粉绿撞色' },{ cat:'多巴胺', swatches:['#ff00ff','#00ffff','#ffff00'], name:'荧光撞色' },
+      { cat:'莫兰迪', swatches:['#b0a4a4','#d3b8b8'], name:'灰粉' },{ cat:'莫兰迪', swatches:['#a3b1a6','#c5d3c3'], name:'灰绿' },{ cat:'莫兰迪', swatches:['#8fa8c0','#b0c4de'], name:'灰蓝' },{ cat:'莫兰迪', swatches:['#c4a4d4','#dac0e8'], name:'雾紫' },{ cat:'莫兰迪', swatches:['#d3c1b0','#e5d5c5'], name:'奶灰' },{ cat:'莫兰迪', swatches:['#c48b7b','#d9a99a'], name:'豆沙色' },
+      { cat:'国潮', swatches:['#c40000','#ffd700'], name:'中国红+金' },{ cat:'国潮', swatches:['#1a1a1a','#c40000'], name:'墨黑+红' },{ cat:'国潮', swatches:['#5c4033','#ffd700'], name:'深木色+金' },{ cat:'国潮', swatches:['#9b1b30','#2e5d3a'], name:'朱红+墨绿' },{ cat:'国潮', swatches:['#004b87','#ffffff'], name:'青花蓝+白' },
+      { cat:'赛博朋克', swatches:['#800080','#0000ff'], name:'紫+蓝' },{ cat:'赛博朋克', swatches:['#00ffff','#ff00ff'], name:'荧光蓝+粉' },{ cat:'赛博朋克', swatches:['#ff00ff','#000000'], name:'电光紫+黑' },{ cat:'赛博朋克', swatches:['#00ffff','#4b0082'], name:'霓虹蓝+深紫' },{ cat:'赛博朋克', swatches:['#00ff00','#000000'], name:'酸性绿+黑' }
+    ];
 
-        // ---------- 海量风格数据 ----------
-        const styleList = [
-            { name: '网红门头', icon: '📸' }, { name: '现代简约', icon: '▫️' }, { name: '现代传统', icon: '🏮' },
-            { name: '国潮风', icon: '🐉' }, { name: '轻奢风格', icon: '💎' }, { name: '赛博朋克', icon: '🤖' },
-            { name: '卡通风格', icon: '🐱' }, { name: '韩式清新', icon: '🌸' }, { name: '科技风格', icon: '🔬' },
-            { name: '欧式风格', icon: '🏛️' }, { name: '泰式东南亚', icon: '🌴' }, { name: '新中式', icon: '🍃' },
-            { name: '原木风格', icon: '🪵' }, { name: '灯箱一体式', icon: '💠' }, { name: '异形创意', icon: '🌀' },
-            { name: '多层叠加', icon: '📚' }, { name: '转角式创意', icon: '↗️' }, { name: '格栅造型', icon: '📏' },
-            { name: '立体悬挑式', icon: '🧩' }, { name: '平面招牌式', icon: '🪧' }, { name: '中式屋檐', icon: '🏯' },
-            // 新增大量风格
-            { name: '现代极简风', icon: '▫️' }, { name: '现代轻奢风', icon: '💎' }, { name: '现代高级灰风', icon: '🔘' },
-            { name: '现代科技风', icon: '🔬' }, { name: '未来赛博朋克风', icon: '🤖' }, { name: '工业风', icon: '⚙️' },
-            { name: '工业复古风', icon: '🏭' }, { name: '美式街头风', icon: '🗽' }, { name: '日式居酒屋风', icon: '🏮' },
-            { name: '日式深夜食堂风', icon: '🌃' }, { name: '韩式潮流风', icon: '🇰🇷' }, { name: '韩式霓虹风', icon: '💡' },
-            { name: '新中式风', icon: '🍃' }, { name: '新国潮风', icon: '🐉' }, { name: '中式烟火风', icon: '🏮' },
-            { name: '中式复古风', icon: '📻' }, { name: '港风夜市风', icon: '🌆' }, { name: '港式霓虹风', icon: '💈' },
-            { name: '港式怀旧风', icon: '📺' }, { name: '台湾夜市风', icon: '🍢' }, { name: '东南亚夜市风', icon: '🌴' },
-            { name: '泰式街头风', icon: '🛵' }, { name: '侘寂风', icon: '🪵' }, { name: '原木自然风', icon: '🌿' },
-            { name: '北欧简约风', icon: '🇳🇴' }, { name: '法式复古风', icon: '🥐' }, { name: '法式轻奢风', icon: '🥂' },
-            { name: '美式复古餐吧风', icon: '🍔' }, { name: '美式机车风', icon: '🏍️' }, { name: '露营烧烤风', icon: '🏕️' },
-            { name: '野营工业风', icon: '⛺' }, { name: '炭火原生态风', icon: '🔥' }, { name: '江湖烧烤风', icon: '⚔️' },
-            { name: '龙虾夜宵风', icon: '🦞' }, { name: '大排档烟火风', icon: '🍻' }, { name: '音乐酒馆风', icon: '🎵' },
-            { name: 'LiveHouse风', icon: '🎸' }, { name: '精酿酒馆风', icon: '🍺' }, { name: '酒吧融合风', icon: '🍾' },
-            { name: '夜店潮玩风', icon: '🎱' }, { name: '电竞主题风', icon: '🎮' }, { name: '机能风', icon: '🦾' },
-            { name: '未来机械风', icon: '🤖' }, { name: '宇宙科技风', icon: '🚀' }, { name: '太空舱风', icon: '🛸' },
-            { name: '城市霓虹风', icon: '🌃' }, { name: '黑金高端风', icon: '🖤' }, { name: '黑武士风', icon: '⚔️' },
-            { name: '暗黑工业风', icon: '🏴' }, { name: '潮牌集合店风', icon: '🧢' }, { name: '网红打卡风', icon: '📸' },
-            { name: '小红书爆款风', icon: '📕' }, { name: 'INS极简风', icon: '📷' }, { name: '奶油风', icon: '🧁' },
-            { name: '治愈系暖光风', icon: '🕯️' }, { name: '多巴胺色彩风', icon: '🌈' }, { name: '孟菲斯风', icon: '🎨' },
-            { name: '撞色潮流风', icon: '🟥' }, { name: '复古迪厅风', icon: '🪩' }, { name: '90年代怀旧风', icon: '📼' },
-            { name: '80年代港风风格', icon: '🇭🇰' }, { name: '复古录像厅风', icon: '📽️' }, { name: '老上海复古风', icon: '🀄' },
-            { name: '民国风', icon: '🏮' }, { name: '国风灯笼街风', icon: '🏮' }, { name: '古镇烟火风', icon: '🏘️' },
-            { name: '国潮未来风', icon: '🐉' }, { name: '赛博国潮风', icon: '🤖' }, { name: '武侠江湖风', icon: '⚔️' },
-            { name: '唐风酒肆风', icon: '🍶' }, { name: '宋代市井风', icon: '🏮' }, { name: '汉唐夜宴风', icon: '🎎' },
-            { name: '禅意东方风', icon: '🧘' }, { name: '山野民宿风', icon: '🏡' }, { name: '乡村复古风', icon: '🌾' },
-            { name: '农家乐升级风', icon: '🐓' }, { name: '集装箱创意风', icon: '📦' }, { name: '仓库改造风', icon: '🏭' },
-            { name: '街边档口升级风', icon: '🛒' }, { name: '商场旗舰店风', icon: '🏬' }, { name: '连锁品牌标准店风', icon: '🏢' },
-            { name: '高端餐饮旗舰风', icon: '🍽️' }, { name: '艺术装置风', icon: '🗿' }, { name: '视觉实验风', icon: '👁️' },
-            { name: '异形建筑风', icon: '🏗️' }, { name: '几何切割风', icon: '📐' }, { name: '流线型未来风', icon: '🌊' },
-            { name: '模块化拼接风', icon: '🧩' }, { name: '极致对称风', icon: '🪞' }, { name: '橱窗展示强化风', icon: '🪟' },
-            { name: 'IP主题风', icon: '🐻' }, { name: '动漫联名风', icon: '🎌' }, { name: '二次元潮玩风', icon: '👾' },
-            { name: '机车俱乐部风', icon: '🏍️' }, { name: '篮球街区风', icon: '🏀' }, { name: '滑板文化风', icon: '🛹' },
-            { name: '嘻哈街头风', icon: '🎤' }, { name: '朋克风', icon: '🎸' }, { name: '重金属风', icon: '🤘' },
-            { name: '电子音乐风', icon: '🎧' }, { name: '霓虹电玩风', icon: '🕹️' }, { name: '电影场景风', icon: '🎬' },
-            { name: '老成都烟火风', icon: '🍲' }, { name: '重庆江湖风', icon: '🌶️' }, { name: '西安市井风', icon: '🏮' },
-            { name: '东北烧烤风', icon: '🍖' }, { name: '新疆炭烤风', icon: '🐑' }, { name: '云南火塘风', icon: '🔥' },
-            { name: '蒙古烤肉风', icon: '🐎' }, { name: '海边夜市风', icon: '🌊' }, { name: '滨海度假风', icon: '🏖️' },
-            { name: '热带水果夜市风', icon: '🥥' }, { name: '沙漠公路风', icon: '🏜️' }, { name: '公路餐车风', icon: '🚚' },
-            { name: '露台酒馆风', icon: '🍸' }, { name: '屋顶烧烤风', icon: '🏠' }, { name: '庭院式烧烤风', icon: '🏡' },
-            { name: '森林木屋风', icon: '🛖' }, { name: '山野篝火风', icon: '🔥' }, { name: '极繁视觉风', icon: '💥' },
-            { name: '极简留白风', icon: '⬜' }, { name: '高饱和爆款风', icon: '🌈' }, { name: '低饱和高级感风', icon: '🎨' },
-            { name: '暖光治愈风', icon: '🕯️' }, { name: '冷调科技风', icon: '❄️' }, { name: '红黑压迫感风', icon: '❤️‍🔥' },
-            { name: '橙黄食欲风', icon: '🍊' }, { name: '绿植生态风', icon: '🌿' }, { name: '水泥毛坯风', icon: '🧱' },
-            { name: '砖墙复古风', icon: '🧱' }, { name: '铁艺焊接风', icon: '🔩' }, { name: '霓虹灯艺术风', icon: '💈' },
-            { name: '全息投影科技风', icon: '🌐' }, { name: '数字光影风', icon: '📱' }, { name: 'AI未来餐厅风', icon: '🤖' },
-            { name: '元宇宙商业风', icon: '🥽' }
-        ];
-
-        // 去重
-        const uniqueStyles = [...new Map(styleList.map(s => [s.name, s])).values()];
-
-        function renderStyleButtons() {
-            const container = document.getElementById('styleGroup');
-            if (!container) return;
-            container.innerHTML = '';
-            uniqueStyles.forEach(s => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.setAttribute('data-value', s.name);
-                btn.innerHTML = `${s.icon} ${s.name}`;
-                container.appendChild(btn);
-            });
+    function renderColorButtons() {
+      const container = document.getElementById('colorContainer');
+      if (!container) return;
+      let currentCat = '';
+      colorPalette.forEach(color => {
+        if (color.cat !== currentCat) {
+          const label = document.createElement('div');
+          label.className = 'industry-label';
+          label.style.marginTop = '6px';
+          label.textContent = color.cat;
+          container.appendChild(label);
+          currentCat = color.cat;
         }
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.setAttribute('data-value', color.name);
+        btn.setAttribute('data-parent', color.cat);
+        let swatchHtml = '';
+        color.swatches.forEach(hex => { swatchHtml += `<span class="color-swatch" style="background:${hex};"></span>`; });
+        btn.innerHTML = `${swatchHtml} ${color.name}`;
+        container.appendChild(btn);
+      });
+    }
 
-        // 初始化其他功能（颜色、材质等省略，实际需完整）
-        renderStyleButtons();
-        // ... 其他初始化代码
+    // 风格数据
+    const styleList = [
+      { name: '网红门头', icon: '📸' },{ name: '现代简约', icon: '▫️' },{ name: '现代传统', icon: '🏮' },{ name: '国潮风', icon: '🐉' },{ name: '轻奢风格', icon: '💎' },{ name: '赛博朋克', icon: '🤖' },{ name: '卡通风格', icon: '🐱' },{ name: '韩式清新', icon: '🌸' },{ name: '科技风格', icon: '🔬' },{ name: '欧式风格', icon: '🏛️' },{ name: '泰式东南亚', icon: '🌴' },{ name: '新中式', icon: '🍃' },{ name: '原木风格', icon: '🪵' },{ name: '灯箱一体式', icon: '💠' },{ name: '异形创意', icon: '🌀' },{ name: '多层叠加', icon: '📚' },{ name: '转角式创意', icon: '↗️' },{ name: '格栅造型', icon: '📏' },{ name: '立体悬挑式', icon: '🧩' },{ name: '平面招牌式', icon: '🪧' },{ name: '中式屋檐', icon: '🏯' },
+      { name: '现代极简风', icon: '▫️' },{ name: '现代轻奢风', icon: '💎' },{ name: '现代高级灰风', icon: '🔘' },{ name: '现代科技风', icon: '🔬' },{ name: '未来赛博朋克风', icon: '🤖' },{ name: '工业风', icon: '⚙️' },{ name: '工业复古风', icon: '🏭' },{ name: '美式街头风', icon: '🗽' },{ name: '日式居酒屋风', icon: '🏮' },{ name: '日式深夜食堂风', icon: '🌃' },{ name: '韩式潮流风', icon: '🇰🇷' },{ name: '韩式霓虹风', icon: '💡' },{ name: '新中式风', icon: '🍃' },{ name: '新国潮风', icon: '🐉' },{ name: '中式烟火风', icon: '🏮' },{ name: '中式复古风', icon: '📻' },{ name: '港风夜市风', icon: '🌆' },{ name: '港式霓虹风', icon: '💈' },{ name: '港式怀旧风', icon: '📺' },{ name: '台湾夜市风', icon: '🍢' },{ name: '东南亚夜市风', icon: '🌴' },{ name: '泰式街头风', icon: '🛵' },{ name: '侘寂风', icon: '🪵' },{ name: '原木自然风', icon: '🌿' },{ name: '北欧简约风', icon: '🇳🇴' },{ name: '法式复古风', icon: '🥐' },{ name: '法式轻奢风', icon: '🥂' },{ name: '美式复古餐吧风', icon: '🍔' },{ name: '美式机车风', icon: '🏍️' },{ name: '露营烧烤风', icon: '🏕️' },{ name: '野营工业风', icon: '⛺' },{ name: '炭火原生态风', icon: '🔥' },{ name: '江湖烧烤风', icon: '⚔️' },{ name: '龙虾夜宵风', icon: '🦞' },{ name: '大排档烟火风', icon: '🍻' },{ name: '音乐酒馆风', icon: '🎵' },{ name: 'LiveHouse风', icon: '🎸' },{ name: '精酿酒馆风', icon: '🍺' },{ name: '酒吧融合风', icon: '🍾' },{ name: '夜店潮玩风', icon: '🎱' },{ name: '电竞主题风', icon: '🎮' },{ name: '机能风', icon: '🦾' },{ name: '未来机械风', icon: '🤖' },{ name: '宇宙科技风', icon: '🚀' },{ name: '太空舱风', icon: '🛸' },{ name: '城市霓虹风', icon: '🌃' },{ name: '黑金高端风', icon: '🖤' },{ name: '黑武士风', icon: '⚔️' },{ name: '暗黑工业风', icon: '🏴' },{ name: '潮牌集合店风', icon: '🧢' },{ name: '网红打卡风', icon: '📸' },{ name: '小红书爆款风', icon: '📕' },{ name: 'INS极简风', icon: '📷' },{ name: '奶油风', icon: '🧁' },{ name: '治愈系暖光风', icon: '🕯️' },{ name: '多巴胺色彩风', icon: '🌈' },{ name: '孟菲斯风', icon: '🎨' },{ name: '撞色潮流风', icon: '🟥' },{ name: '复古迪厅风', icon: '🪩' },{ name: '90年代怀旧风', icon: '📼' },{ name: '80年代港风风格', icon: '🇭🇰' },{ name: '复古录像厅风', icon: '📽️' },{ name: '老上海复古风', icon: '🀄' },{ name: '民国风', icon: '🏮' },{ name: '国风灯笼街风', icon: '🏮' },{ name: '古镇烟火风', icon: '🏘️' },{ name: '国潮未来风', icon: '🐉' },{ name: '赛博国潮风', icon: '🤖' },{ name: '武侠江湖风', icon: '⚔️' },{ name: '唐风酒肆风', icon: '🍶' },{ name: '宋代市井风', icon: '🏮' },{ name: '汉唐夜宴风', icon: '🎎' },{ name: '禅意东方风', icon: '🧘' },{ name: '山野民宿风', icon: '🏡' },{ name: '乡村复古风', icon: '🌾' },{ name: '农家乐升级风', icon: '🐓' },{ name: '集装箱创意风', icon: '📦' },{ name: '仓库改造风', icon: '🏭' },{ name: '街边档口升级风', icon: '🛒' },{ name: '商场旗舰店风', icon: '🏬' },{ name: '连锁品牌标准店风', icon: '🏢' },{ name: '高端餐饮旗舰风', icon: '🍽️' },{ name: '艺术装置风', icon: '🗿' },{ name: '视觉实验风', icon: '👁️' },{ name: '异形建筑风', icon: '🏗️' },{ name: '几何切割风', icon: '📐' },{ name: '流线型未来风', icon: '🌊' },{ name: '模块化拼接风', icon: '🧩' },{ name: '极致对称风', icon: '🪞' },{ name: '橱窗展示强化风', icon: '🪟' },{ name: 'IP主题风', icon: '🐻' },{ name: '动漫联名风', icon: '🎌' },{ name: '二次元潮玩风', icon: '👾' },{ name: '机车俱乐部风', icon: '🏍️' },{ name: '篮球街区风', icon: '🏀' },{ name: '滑板文化风', icon: '🛹' },{ name: '嘻哈街头风', icon: '🎤' },{ name: '朋克风', icon: '🎸' },{ name: '重金属风', icon: '🤘' },{ name: '电子音乐风', icon: '🎧' },{ name: '霓虹电玩风', icon: '🕹️' },{ name: '电影场景风', icon: '🎬' },{ name: '老成都烟火风', icon: '🍲' },{ name: '重庆江湖风', icon: '🌶️' },{ name: '西安市井风', icon: '🏮' },{ name: '东北烧烤风', icon: '🍖' },{ name: '新疆炭烤风', icon: '🐑' },{ name: '云南火塘风', icon: '🔥' },{ name: '蒙古烤肉风', icon: '🐎' },{ name: '海边夜市风', icon: '🌊' },{ name: '滨海度假风', icon: '🏖️' },{ name: '热带水果夜市风', icon: '🥥' },{ name: '沙漠公路风', icon: '🏜️' },{ name: '公路餐车风', icon: '🚚' },{ name: '露台酒馆风', icon: '🍸' },{ name: '屋顶烧烤风', icon: '🏠' },{ name: '庭院式烧烤风', icon: '🏡' },{ name: '森林木屋风', icon: '🛖' },{ name: '山野篝火风', icon: '🔥' },{ name: '极繁视觉风', icon: '💥' },{ name: '极简留白风', icon: '⬜' },{ name: '高饱和爆款风', icon: '🌈' },{ name: '低饱和高级感风', icon: '🎨' },{ name: '暖光治愈风', icon: '🕯️' },{ name: '冷调科技风', icon: '❄️' },{ name: '红黑压迫感风', icon: '❤️‍🔥' },{ name: '橙黄食欲风', icon: '🍊' },{ name: '绿植生态风', icon: '🌿' },{ name: '水泥毛坯风', icon: '🧱' },{ name: '砖墙复古风', icon: '🧱' },{ name: '铁艺焊接风', icon: '🔩' },{ name: '霓虹灯艺术风', icon: '💈' },{ name: '全息投影科技风', icon: '🌐' },{ name: '数字光影风', icon: '📱' },{ name: 'AI未来餐厅风', icon: '🤖' },{ name: '元宇宙商业风', icon: '🥽' }
+    ];
+    const uniqueStyles = [...new Map(styleList.map(s => [s.name, s])).values()];
 
-        // 生成逻辑等保持不变，为简洁省略
-        // 实际部署需包含完整生成代码
-    })();
+    function renderStyleButtons() {
+      const container = document.getElementById('styleGroup');
+      if (!container) return;
+      container.innerHTML = '';
+      uniqueStyles.forEach(s => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.setAttribute('data-value', s.name);
+        btn.innerHTML = `${s.icon} ${s.name}`;
+        container.appendChild(btn);
+      });
+    }
+
+    // 系统库
+    const system = {
+      场景: ['高端购物中心一层','临街独立商铺','核心商圈步行街','社区底商业态','百货商场一层','艺术园区体验店','交通枢纽快闪店','地下商业街入口']
+    };
+    const basePerspective = ['必须100%正面平视拍摄','镜头与门头立面完全垂直','禁止侧拍/斜拍/45度视角','禁止透视变形','建筑左右完全对称构图','商业街真实立面视角','行人视角高度拍摄'];
+    const layoutDesc = {
+      '单开间门头':'单开间铺面，宽度较窄，竖向比例高，精致紧凑','双开间门头':'双开间铺面，宽度适中，左右对称均衡','三开间门头':'三开间铺面，宽度较宽，横向延展大气','横向超宽':'横向超宽大幅面，弱化竖向分割，水平延伸感强，广角平视，比例16:9','竖向':'竖向延伸，强调垂直视觉，挺拔高耸，比例9:16','多层':'多层叠加结构，层次丰富，前后景深，立体感强','叠加':'叠加式造型，多种材质/形状上下或前后叠加'
+    };
+
+    function shuffleArray(arr) { const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+    function initMultiSelect(containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.addEventListener('click', (e) => {
+        const btn = e.target.closest('.option-btn');
+        if (!btn) return;
+        btn.classList.toggle('selected');
+      });
+    }
+
+    function initSingleSelect(containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.addEventListener('click', (e) => {
+        const btn = e.target.closest('.option-btn');
+        if (!btn) return;
+        container.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+      });
+    }
+
+    function getSelectedValue(containerId) {
+      const container = document.getElementById(containerId);
+      const sel = container ? container.querySelector('.option-btn.selected') : null;
+      return sel ? sel.getAttribute('data-value') : '';
+    }
+
+    function getMultiSelectedValues(containerId) {
+      const container = document.getElementById(containerId);
+      const selected = container ? container.querySelectorAll('.option-btn.selected') : [];
+      const values = [], parents = new Set();
+      selected.forEach(b => { values.push(b.getAttribute('data-value')); if(b.dataset.parent) parents.add(b.dataset.parent); });
+      return { values, parents: Array.from(parents) };
+    }
+
+    function buildPrompt(brand, subtitle, indStr, styStr, shpStr, matInfo, fntStr, clrStr, layout, layer, time, district, other) {
+      let p = `【商业门头设计】\n`;
+      if (brand) p += `\n品牌：${brand}`;
+      if (subtitle) p += `\n副标题：${subtitle}（严格比例：字号为品牌名称的1/2，位于品牌名称正下方）`;
+      if (indStr) p += `\n行业：${indStr}`;
+      if (styStr) p += `\n风格：${styStr}`;
+      if (shpStr) p += `\n异形门头：${shpStr}`;
+      const scene = district === '不限' ? system.场景[Math.floor(Math.random()*system.场景.length)] : district;
+      p += `\n场景：${scene}`;
+      if (matInfo.values.length) { p += `\n材质系统：${matInfo.parents.join('·')}`; p += `\n材质组合：${matInfo.values.join(' + ')}`; }
+      if (fntStr) p += `\n招牌文字材质：${fntStr}`;
+      if (clrStr) p += `\n颜色：${clrStr}`;
+      if (layout) { p += `\n布局：${layout}`; if (layoutDesc[layout]) p += `\n布局说明：${layoutDesc[layout]}`; }
+      if (layer) p += `\n层数：${layer}`;
+      if (time) { p += `\n时间：${time}`; if (time==='白天') p += `\n光照：自然光照明，通透日景效果`; else p += `\n光照：夜景灯光效果，发光字/灯箱突出`; }
+      if (other) p += `\n\n💬 其他需求：\n${other}`;
+      let persp = [...basePerspective]; if (layout&&layoutDesc[layout]) persp.push(layoutDesc[layout]); persp = shuffleArray(persp);
+      p += `\n\n🔒 视角与构图：\n${persp.join('，')}`;
+      p += `\n\n🎯 核心要求：\n完全正立面展示，商业街实体门头，可落地施工，5秒远距离识别`;
+      return p;
+    }
+
+    function generate20(params) {
+      const set = new Set(); const res = []; let safety = 0;
+      while (res.length < 20 && safety < 800) { const pr = buildPrompt(...params); if (!set.has(pr)) { set.add(pr); res.push(pr); } safety++; }
+      return res;
+    }
+
+    function generatePrompts() {
+      const brand = document.getElementById('brandInput').value.trim(); if (!brand) { alert('请输入品牌名称'); return; }
+      const subtitle = document.getElementById('subtitleInput').value.trim();
+      const other = document.getElementById('otherInput').value.trim();
+      const district = document.getElementById('districtSelect').value;
+      const iBtns = document.querySelectorAll('#industryContainer .option-btn.selected'); const iItems = Array.from(iBtns).map(b => `${b.dataset.parent}·${b.dataset.value}`); const iStr = iItems.join(', ');
+      const sBtns = document.querySelectorAll('#styleGroup .option-btn.selected'); const sStr = Array.from(sBtns).map(b => b.dataset.value).join(', ');
+      const hBtns = document.querySelectorAll('#shapeContainer .option-btn.selected'); const hStr = Array.from(hBtns).map(b => `${b.dataset.parent}·${b.dataset.value}`).join(', ');
+      const matInfo = getMultiSelectedValues('materialContainer');
+      const fBtns = document.querySelectorAll('#fontMaterialContainer .option-btn.selected'); const fStr = Array.from(fBtns).map(b => b.dataset.value).join(', ');
+      const cBtns = document.querySelectorAll('#colorContainer .option-btn.selected'); const cStr = Array.from(cBtns).map(b => b.dataset.value).join(', ');
+      const layout = getSelectedValue('layoutGroup'); const layer = getSelectedValue('layerGroup'); const time = getSelectedValue('timeGroup');
+      const params = [brand, subtitle, iStr, sStr, hStr, matInfo, fStr, cStr, layout, layer, time, district, other];
+      const btn = document.getElementById('generateBtn'); btn.disabled = true; btn.textContent = '⏳ 生成中...';
+      document.getElementById('resultsGrid').innerHTML = '<div class="empty-state">⏳ 正在生成20组不重复提示词...</div>';
+      setTimeout(() => {
+        try {
+          const prompts = generate20(params); window.DATA = prompts; const grid = document.getElementById('resultsGrid'); grid.innerHTML = '';
+          prompts.forEach((txt, idx) => {
+            const card = document.createElement('div'); card.className = 'card'; let badges = '';
+            if (iStr) badges += `<span class="card-badge">${iStr}</span>`;
+            if (matInfo.values.length) badges += `<span class="card-badge green">${matInfo.values.join('+')}</span>`;
+            if (sStr) badges += `<span class="card-badge">${sStr}</span>`;
+            if (hStr) badges += `<span class="card-badge">🎭${hStr}</span>`;
+            if (layout) badges += `<span class="card-badge">${layout}</span>`;
+            if (layer) badges += `<span class="card-badge">${layer}</span>`;
+            if (time) badges += `<span class="card-badge">${time}</span>`;
+            if (cStr) badges += `<span class="card-badge">${cStr}</span>`;
+            card.innerHTML = `<div class="card-header"><div class="card-number">${idx+1}</div>${badges}</div><div class="prompt-text">${txt}</div><button class="copy-btn" data-index="${idx}">📋复制</button>`;
+            grid.appendChild(card);
+          });
+          document.querySelectorAll('.copy-btn').forEach(b => { b.addEventListener('click', function() { const i = parseInt(this.getAttribute('data-index')); const t = window.DATA[i]; if (navigator.clipboard?.writeText) { navigator.clipboard.writeText(t).then(() => { this.textContent='✓已复制'; this.classList.add('copied'); setTimeout(()=>{this.textContent='📋复制';this.classList.remove('copied')},1500) }).catch(()=>fallbackCopy(this,t)) } else fallbackCopy(this,t) }) });
+          document.getElementById('statsBadge').textContent = `✅20组 | ${brand}`;
+        } catch(e) { console.error(e); document.getElementById('resultsGrid').innerHTML = '<div class="empty-state">❌生成失败，请重试</div>'; }
+        finally { btn.disabled = false; btn.textContent = '⚡ 生成20组结构化提示词'; }
+      }, 80);
+    }
+
+    function fallbackCopy(btn, text) { const ta = document.createElement('textarea'); ta.value = text; ta.style.position='fixed';ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy')}catch(e){} document.body.removeChild(ta); btn.textContent='✓已复制'; btn.classList.add('copied'); setTimeout(()=>{btn.textContent='📋复制';btn.classList.remove('copied')},1500); }
+
+    // 初始化所有组件
+    renderColorButtons();
+    renderStyleButtons();
+    initMultiSelect('industryContainer');
+    initMultiSelect('styleGroup');
+    initMultiSelect('shapeContainer');
+    initMultiSelect('materialContainer');
+    initMultiSelect('fontMaterialContainer');
+    initMultiSelect('colorContainer');
+    initSingleSelect('layoutGroup');
+    initSingleSelect('layerGroup');
+    initSingleSelect('timeGroup');
+    document.getElementById('generateBtn').addEventListener('click', generatePrompts);
+    window.generatePrompts = generatePrompts;
+  })();
 </script>
 </body>
 </html>
